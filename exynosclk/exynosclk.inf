@@ -1,0 +1,52 @@
+; Exynos4 clock controller (CMU) (GT-N7000), Windows RT 8.1.
+;
+;   dism /Image:<mount> /Add-Driver /Driver:exynosclk.inf /ForceUnsigned
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider    = %Provider%
+DriverVer   = 10/31/2026,1.0.0.0
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[SourceDisksNames]
+1 = %Disk%
+
+[SourceDisksFiles]
+exynosclk.sys = 1
+
+[Manufacturer]
+%Mfg% = Devices, NTARM
+
+[Devices.NTARM]
+%DeviceDesc% = Install, ACPI\EXYN0005
+
+[Install.NT]
+CopyFiles = Files
+
+[Files]
+exynosclk.sys
+
+[Install.NT.Services]
+AddService = exynosclk, 0x00000002, Service
+
+[Service]
+ServiceType   = 1               ; SERVICE_KERNEL_DRIVER
+StartType     = 3               ; SERVICE_DEMAND_START
+ErrorControl  = 1
+ServiceBinary = %12%\exynosclk.sys
+
+[Install.NT.Wdf]
+KmdfService = exynosclk, Wdf
+
+[Wdf]
+KmdfLibraryVersion = 1.13
+
+[Strings]
+Provider   = "Exynos441x"
+Mfg        = "Samsung"
+Disk       = "Exynos441x drivers"
+DeviceDesc = "Exynos4 clock controller (CMU)"

@@ -1,0 +1,52 @@
+; Exynos4 USB log and debug channel (DWC2) (GT-N7000), Windows RT 8.1.
+;
+;   dism /Image:<mount> /Add-Driver /Driver:exynosusb.inf /ForceUnsigned
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider    = %Provider%
+DriverVer   = 10/31/2026,1.0.0.0
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[SourceDisksNames]
+1 = %Disk%
+
+[SourceDisksFiles]
+exynosusb.sys = 1
+
+[Manufacturer]
+%Mfg% = Devices, NTARM
+
+[Devices.NTARM]
+%DeviceDesc% = Install, ACPI\EXYN0001
+
+[Install.NT]
+CopyFiles = Files
+
+[Files]
+exynosusb.sys
+
+[Install.NT.Services]
+AddService = exynosusb, 0x00000002, Service
+
+[Service]
+ServiceType   = 1               ; SERVICE_KERNEL_DRIVER
+StartType     = 3               ; SERVICE_DEMAND_START
+ErrorControl  = 1
+ServiceBinary = %12%\exynosusb.sys
+
+[Install.NT.Wdf]
+KmdfService = exynosusb, Wdf
+
+[Wdf]
+KmdfLibraryVersion = 1.13
+
+[Strings]
+Provider   = "Exynos441x"
+Mfg        = "Samsung"
+Disk       = "Exynos441x drivers"
+DeviceDesc = "Exynos4 USB log and debug channel (DWC2)"

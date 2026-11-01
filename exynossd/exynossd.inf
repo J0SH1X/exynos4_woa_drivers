@@ -1,0 +1,77 @@
+; Exynos4210 HSMMC2 (microSD) host controller (GT-N7000), sdport miniport.
+; Windows 10 only: sdport.sys does not exist in Windows 8.1.
+;
+; From Microsoft's sdhc sample INF (MS-PL): sdport reads the SD command
+; tables below from the service's Parameters key.
+;
+;   dism /Image:<mount> /Add-Driver /Driver:exynossd.inf /ForceUnsigned
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = SDHost
+ClassGuid   = {a0a588a4-c46f-4b37-b7ea-c82fe89870c6}
+Provider    = %Provider%
+DriverVer   = 10/31/2026,1.0.0.0
+
+[SourceDisksNames]
+1 = %Disk%
+
+[SourceDisksFiles]
+exynossd.sys = 1
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[Manufacturer]
+%Mfg% = Devices, NTARM
+
+[Devices.NTARM]
+%DeviceDesc% = SDHost, ACPI\EXYN0006
+
+[SDHost]
+CopyFiles = Files
+AddReg    = SDHC_AddReg
+
+[Files]
+exynossd.sys
+
+[SDHC_AddReg]
+HKR,,Driver,,"exynossd.sys"
+
+[SDHost.HW]
+AddReg = SDHC_LocationReg
+
+[SDHC_LocationReg]
+HKR,,UINumberDescFormat,,%SDHCSlot%
+
+[SDHost.Services]
+AddService = exynossd, 2, Service
+
+[Service]
+ServiceType    = 1              ; SERVICE_KERNEL_DRIVER
+StartType      = 3              ; SERVICE_DEMAND_START
+ErrorControl   = 1
+ServiceBinary  = %12%\exynossd.sys
+LoadOrderGroup = System Bus Extender
+BootFlags      = 0x00000008
+AddReg         = Service_AddReg
+
+[Service_AddReg]
+HKR,Parameters,SdCmdFlags,1,    05,01, 06,01, 08,11, 09,19, 0A,19, 0D,11, \
+                                10,01, 11,01, 12,01, 17,01, 18,05, 19,05, \
+                                1A,01, 1B,01, 1C,01, \
+                                20,05, 21,05, 26,05, \
+                                2A,01, \
+                                34,02, 35,02, \
+                                37,01, 38,01, \
+                                22,01, 23,05, 24,01, 25,01
+HKR,Parameters,SdAppCmdFlags,1, 06,01, 0D,01, 16,01, 17,01, 33,01, \
+                                12,01, 19,01, 1A,01, 26,01, 2B,01, \
+                                2C,01, 2D,01, 2E,01, 2F,01, 30,01, 31,01
+
+[Strings]
+Provider   = "Exynos441x"
+Mfg        = "Samsung"
+Disk       = "Exynos441x drivers"
+DeviceDesc = "Exynos4 HSMMC2 microSD host controller"
+SDHCSlot   = "SD Host Slot %1!u!"

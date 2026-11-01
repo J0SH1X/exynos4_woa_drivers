@@ -1,0 +1,56 @@
+; microSD (Exynos4210 HSMMC2, GT-N7000) as a Storport disk, Windows RT 8.1.
+; (Windows 10 has sdport: use exynossd there.)
+;
+;   dism /Image:<mount> /Add-Driver /Driver:exynosstor.inf /ForceUnsigned
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = SCSIAdapter
+ClassGuid   = {4D36E97B-E325-11CE-BFC1-08002BE10318}
+Provider    = %Provider%
+DriverVer   = 10/31/2026,1.0.0.0
+
+[SourceDisksNames]
+1 = %Disk%
+
+[SourceDisksFiles]
+exynosstor.sys = 1
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[Manufacturer]
+%Mfg% = Devices, NTARM
+
+[Devices.NTARM]
+%DeviceDesc% = Install, ACPI\EXYN0006
+
+[Install.NT]
+CopyFiles = Files
+
+[Files]
+exynosstor.sys
+
+[Install.NT.Services]
+AddService = exynosstor, 0x00000002, Service
+
+[Service]
+ServiceType    = 1              ; SERVICE_KERNEL_DRIVER
+StartType      = 0              ; SERVICE_BOOT_START: can carry the system disk
+ErrorControl   = 1
+ServiceBinary  = %12%\exynosstor.sys
+LoadOrderGroup = SCSI miniport
+AddReg         = Service_AddReg
+
+[Service_AddReg]
+; Storport: this miniport handles PnP devices of interface type Internal (0),
+; PNPBus (15) and ACPIBus (17).
+HKR, "Parameters\PnpInterface", "0", 0x00010001, 0x00000001
+HKR, "Parameters\PnpInterface", "15", 0x00010001, 0x00000001
+HKR, "Parameters\PnpInterface", "17", 0x00010001, 0x00000001
+
+[Strings]
+Provider   = "Exynos441x"
+Mfg        = "Samsung"
+Disk       = "Exynos441x drivers"
+DeviceDesc = "Exynos4 HSMMC2 microSD (Storport)"

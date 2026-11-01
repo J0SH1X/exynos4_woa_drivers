@@ -1,0 +1,52 @@
+; Exynos4 I2C controller (GT-N7000), Windows RT 8.1.
+;
+;   dism /Image:<mount> /Add-Driver /Driver:exynosi2c.inf /ForceUnsigned
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider    = %Provider%
+DriverVer   = 10/31/2026,1.0.0.0
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[SourceDisksNames]
+1 = %Disk%
+
+[SourceDisksFiles]
+exynosi2c.sys = 1
+
+[Manufacturer]
+%Mfg% = Devices, NTARM
+
+[Devices.NTARM]
+%DeviceDesc% = Install, ACPI\EXYN0002
+
+[Install.NT]
+CopyFiles = Files
+
+[Files]
+exynosi2c.sys
+
+[Install.NT.Services]
+AddService = exynosi2c, 0x00000002, Service
+
+[Service]
+ServiceType   = 1               ; SERVICE_KERNEL_DRIVER
+StartType     = 3               ; SERVICE_DEMAND_START
+ErrorControl  = 1
+ServiceBinary = %12%\exynosi2c.sys
+
+[Install.NT.Wdf]
+KmdfService = exynosi2c, Wdf
+
+[Wdf]
+KmdfLibraryVersion = 1.13
+
+[Strings]
+Provider   = "Exynos441x"
+Mfg        = "Samsung"
+Disk       = "Exynos441x drivers"
+DeviceDesc = "Exynos4 I2C controller"
